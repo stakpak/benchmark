@@ -121,9 +121,82 @@ aws_eks_cluster.this > module.self_managed_node_group
 
 ### Metrics
 
-- **Total Time**: 25 Seconds
+- **Total Time**: 25.281 Seconds
 - **Total Cost**: $0.001678
 
 
 ### OpenAI o1-preview
 
+#### Diagram
+
+![Result Diagram](./assets/example1-o1.png)
+
+#### Code
+```
+direction right
+
+aws_cloud {
+  aws_eks [icon: "aws-eks", label: "Elastic Kubernetes Service"] {
+    aws_eks_cluster.this [icon: "aws-eks", label: "EKS Cluster"]
+    aws_eks_access_entry.this [icon: "aws-eks", label: "EKS Access Entry"]
+    aws_eks_access_policy_association.this [icon: "aws-eks", label: "EKS Access Policy Association"]
+    aws_eks_addon.this [icon: "aws-eks", label: "EKS Add-ons"]
+    aws_eks_addon.before_compute [icon: "aws-eks", label: "EKS Pre-Compute Add-ons"]
+    aws_eks_identity_provider_config.this [icon: "aws-eks", label: "EKS Identity Provider Config"]
+    module.fargate_profile [icon: "aws-eks", label: "EKS Fargate Profiles"]
+    module.eks_managed_node_group [icon: "aws-eks", label: "EKS Managed Node Groups"]
+    module.self_managed_node_group [icon: "aws-eks", label: "EKS Self-Managed Node Groups"]
+  }
+
+  aws_iam [icon: "aws-iam", label: "Identity and Access Management"] {
+    aws_iam_role.this [icon: "aws-iam", label: "EKS Cluster IAM Role"]
+    aws_iam_role_policy_attachment.this [icon: "aws-iam", label: "IAM Role Policy Attachment"]
+    aws_iam_role_policy_attachment.additional [icon: "aws-iam", label: "Additional IAM Role Policy Attachment"]
+    aws_iam_role_policy_attachment.cluster_encryption [icon: "aws-iam", label: "Cluster Encryption IAM Policy Attachment"]
+    aws_iam_policy.cluster_encryption [icon: "aws-iam", label: "Cluster Encryption IAM Policy"]
+    aws_iam_policy.cni_ipv6_policy [icon: "aws-iam", label: "CNI IPv6 IAM Policy"]
+    aws_iam_openid_connect_provider.oidc_provider [icon: "aws-iam", label: "OIDC Provider"]
+  }
+
+  aws_kms [icon: "aws-kms", label: "Key Management Service"] {
+    module.kms [icon: "aws-kms", label: "EKS KMS Key Module"]
+  }
+
+  aws_cloudwatch [icon: "aws-cloudwatch", label: "CloudWatch"] {
+    aws_cloudwatch_log_group.this [icon: "aws-cloudwatch", label: "CloudWatch Log Group"]
+  }
+
+  aws_ec2 [icon: "aws-ec2", label: "Elastic Compute Cloud"] {
+    aws_security_group.cluster [icon: "aws-ec2", label: "Cluster Security Group"]
+    aws_security_group_rule.cluster [icon: "aws-ec2", label: "Cluster Security Group Rules"]
+    aws_security_group.node [icon: "aws-ec2", label: "Node Security Group"]
+    aws_security_group_rule.node [icon: "aws-ec2", label: "Node Security Group Rules"]
+    aws_ec2_tag.cluster_primary_security_group [icon: "aws-ec2", label: "Cluster Primary Security Group Tag"]
+  }
+}
+
+// Connections
+aws_eks_cluster.this > aws_iam_role.this
+aws_eks_cluster.this > aws_iam_openid_connect_provider.oidc_provider
+aws_eks_cluster.this > aws_security_group.cluster
+aws_eks_cluster.this > aws_security_group.node
+aws_eks_cluster.this > aws_cloudwatch_log_group.this
+aws_eks_cluster.this > module.kms
+aws_iam_role_policy_attachment.this > aws_iam_role.this
+aws_iam_role_policy_attachment.additional > aws_iam_role.this
+aws_iam_role_policy_attachment.cluster_encryption > aws_iam_role.this
+aws_iam_role.this > aws_iam_policy.cluster_encryption
+aws_security_group_rule.cluster > aws_security_group.cluster
+aws_security_group_rule.node > aws_security_group.node
+aws_ec2_tag.cluster_primary_security_group > aws_security_group.cluster
+aws_eks_access_entry.this > aws_eks_cluster.this
+aws_eks_access_policy_association.this > aws_eks_access_entry.this
+module.eks_managed_node_group > aws_eks_cluster.this
+module.self_managed_node_group > aws_eks_cluster.this
+module.fargate_profile > aws_eks_cluster.this
+```
+
+### Metrics
+
+- **Total Time**: 67.541 Seconds
+- **Total Cost**: $0.5904
