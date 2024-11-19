@@ -4,7 +4,7 @@
 
 | Example | Stakpak Time | OpenAI o1-preview Time | Stakpak Cost | OpenAI o1-preview Cost |
 |---------|--------------|------------------------|--------------|------------------------|
-| 1: EKS Module | 25.281s | 67.541s | $0.001678 | $0.5904 |
+| 1: EKS Module | 25.281s | 67.541s | $0.001678 | $0.59 |
 | 2: AWS Nextjs | 11.146s | 61.910s | $0.001023 | $0.45 |
 | 3: Lambda Module | 18.781s | 85.550s | $0.001921 | $0.72 |
 | 4: Route53 Resolver | 4.918s | 104.331s | $0.000515 | $0.52 |
