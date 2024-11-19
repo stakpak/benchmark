@@ -1,4 +1,4 @@
-# Benchmarking converting terraform code to Eraser Diagram
+# Convert Terraform code to Eraser Diagram Benchmark
 
 ## Example 1: Terraform EKS Module
 
