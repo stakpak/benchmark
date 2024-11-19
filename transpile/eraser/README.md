@@ -121,6 +121,7 @@ aws_eks_cluster.this > module.self_managed_node_group
 
 ### Metrics
 
+- **LLM Time**: 21.462 Seconds
 - **Total Time**: 25.281 Seconds
 - **Total Cost**: $0.001678
 
@@ -200,3 +201,143 @@ module.fargate_profile > aws_eks_cluster.this
 
 - **Total Time**: 67.541 Seconds
 - **Total Cost**: $0.5904
+
+
+## Example 2: Terraform EKS Module
+
+### Source
+
+<https://github.com/milliHQ/terraform-aws-next-js>
+
+### Stakpak
+
+#### Diagram
+
+![Result Diagram](./assets/example2-stakpak.png)
+
+#### Code
+```
+direction right
+
+aws_cloud {
+  aws_dynamodb [icon: "aws-dynamodb", label: "DynamoDB"] {
+    aws_dynamodb_table.aliases [icon: "aws-dynamodb", label: "Aliases Table"]
+    aws_dynamodb_table.deployments [icon: "aws-dynamodb", label: "Deployments Table"]
+  }
+  aws_iam [icon: "aws-iam", label: "Identity and Access Management"] {
+    aws_iam_policy.cloudformation_permission [icon: "aws-iam", label: "CloudFormation Permission Policy"]
+    aws_iam_role.cloudformation_permission [icon: "aws-iam", label: "CloudFormation Permission Role"]
+    data_aws_iam_policy_document.cloudformation_permission [icon: "aws-iam", label: "CloudFormation Permission Document"]
+    data_aws_iam_policy_document.cloudformation_permission_assume_role [icon: "aws-iam", label: "CloudFormation Permission Assume Role Document"]
+    data_aws_iam_policy_document.access_static_deployment [icon: "aws-iam", label: "Access Static Deployment Document"]
+  }
+  aws_cloudfront [icon: "aws-cloudfront", label: "CloudFront"] {
+    aws_cloudfront_cache_policy.this [icon: "aws-cloudfront", label: "Cache Policy"]
+    data_aws_cloudfront_origin_request_policy.managed_all_viewer [icon: "aws-cloudfront", label: "Origin Request Policy"]
+  }
+  aws_region [icon: "aws-region", label: "Region"] {
+    data_aws_region.current [icon: "aws-region", label: "Current Region"]
+  }
+  modules [icon: "aws-modules", label: "Modules"] {
+    module.deploy_controller [icon: "aws-modules", label: "Deploy Controller"]
+    module.statics_deploy [icon: "aws-modules", label: "Statics Deploy"]
+    module.api [icon: "aws-modules", label: "API"]
+    module.next_image [icon: "aws-modules", label: "Next Image"]
+    module.proxy_config [icon: "aws-modules", label: "Proxy Config"]
+    module.proxy [icon: "aws-modules", label: "Proxy"]
+    module.cloudfront_main [icon: "aws-modules", label: "CloudFront Main"]
+  }
+}
+
+// Connections
+module.deploy_controller > data_aws_iam_policy_document.cloudformation_permission
+module.statics_deploy > data_aws_iam_policy_document.cloudformation_permission
+data_aws_iam_policy_document.cloudformation_permission > aws_iam_policy.cloudformation_permission
+data_aws_iam_policy_document.cloudformation_permission_assume_role > aws_iam_role.cloudformation_permission
+aws_iam_policy.cloudformation_permission > aws_iam_role.cloudformation_permission
+data_aws_region.current > module.deploy_controller
+aws_dynamodb_table.aliases > module.deploy_controller
+aws_dynamodb_table.deployments > module.deploy_controller
+module.cloudfront_main > module.statics_deploy
+module.deploy_controller > module.statics_deploy
+data_aws_region.current > module.statics_deploy
+aws_dynamodb_table.aliases > module.statics_deploy
+aws_dynamodb_table.deployments > module.statics_deploy
+aws_iam_role.cloudformation_permission > module.statics_deploy
+data_aws_region.current > module.api
+aws_dynamodb_table.aliases > module.api
+aws_dynamodb_table.deployments > module.api
+module.statics_deploy > module.api
+module.statics_deploy > data_aws_iam_policy_document.access_static_deployment
+data_aws_iam_policy_document.access_static_deployment > module.next_image
+data_aws_region.current > module.proxy_config
+aws_dynamodb_table.aliases > module.proxy_config
+module.statics_deploy > module.proxy_config
+```
+
+### Metrics
+
+- **LLM Time**: 10.54 Seconds
+- **Total Time**: 11.146 Seconds
+- **Total Cost**: $0.001023
+
+
+### OpenAI o1-preview
+
+#### Diagram
+
+![Result Diagram](./assets/example2-o1.png)
+
+#### Code
+```
+direction right
+
+aws_cloud {
+  aws_dynamodb [icon: "aws-dynamodb", label: "Amazon DynamoDB"] {
+    aws_dynamodb_table.aliases [icon: "aws-dynamodb-table", label: "DynamoDB Table - Aliases"]
+    aws_dynamodb_table.deployments [icon: "aws-dynamodb-table", label: "DynamoDB Table - Deployments"]
+  }
+
+  aws_iam [icon: "aws-iam", label: "AWS Identity and Access Management"] {
+    aws_iam_policy.cloudformation_permission [icon: "aws-iam-policy", label: "IAM Policy - CloudFormation Permission"]
+    aws_iam_role.cloudformation_permission [icon: "aws-iam-role", label: "IAM Role - CloudFormation Permission"]
+  }
+
+  aws_lambda [icon: "aws-lambda", label: "AWS Lambda"] {
+    module.deploy_controller [icon: "aws-lambda", label: "Lambda Function - Deploy Controller"]
+    module.statics_deploy [icon: "aws-lambda", label: "Lambda Function - Statics Deploy"]
+    module.api [icon: "aws-lambda", label: "Lambda Function - API"]
+    module.next_image [icon: "aws-lambda", label: "Lambda Function - Next/Image"]
+    module.proxy [icon: "aws-lambda", label: "Lambda Function - Proxy (Lambda@Edge)"]
+  }
+
+  aws_s3 [icon: "aws-s3", label: "Amazon S3"] {
+    module.statics_deploy.static_bucket [icon: "aws-s3", label: "S3 Bucket - Static Content"]
+  }
+
+  aws_cloudfront [icon: "aws-cloudfront", label: "Amazon CloudFront"] {
+    aws_cloudfront_cache_policy.this [icon: "aws-cloudfront", label: "CloudFront Cache Policy"]
+    module.cloudfront_main [icon: "aws-cloudfront", label: "CloudFront Distribution"]
+  }
+}
+
+// Connections
+aws_iam_policy.cloudformation_permission > aws_iam_role.cloudformation_permission
+aws_iam_role.cloudformation_permission > module.statics_deploy
+aws_dynamodb_table.aliases > module.deploy_controller
+aws_dynamodb_table.deployments > module.deploy_controller
+aws_dynamodb_table.aliases > module.statics_deploy
+aws_dynamodb_table.deployments > module.statics_deploy
+module.deploy_controller > module.statics_deploy
+module.statics_deploy > module.api
+module.statics_deploy > module.next_image
+module.statics_deploy > module.cloudfront_main
+module.next_image > module.cloudfront_main
+module.proxy_config > module.cloudfront_main
+module.proxy > module.cloudfront_main
+```
+
+### Metrics
+
+- **Total Time**: 61.910 Seconds
+- **Total Cost**: $0.45
