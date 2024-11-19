@@ -537,3 +537,82 @@ module.fargate_profile > aws_eks_cluster.this
 
 - **Total Time**: 85.550 Seconds
 - **Total Cost**: $0.72
+
+## Example 4: Cloudposse AWS Route53 Resolver DNS Firewall
+
+### Source
+
+<https://github.com/cloudposse/terraform-aws-route53-resolver-dns-firewall>
+
+#### Diagram
+
+![Result Diagram](./assets/example4-stakpak.png)
+
+#### Code
+
+```
+aws_cloud {
+  aws_route53 [icon: "aws-route53", label: "Route 53"] {
+    aws_route53_resolver_firewall_config.default [icon: "aws-route53", label: "Resolver Firewall Config"]
+    aws_route53_resolver_firewall_domain_list.default [icon: "aws-route53", label: "Resolver Firewall Domain List"]
+    aws_route53_resolver_firewall_rule_group.default [icon: "aws-route53", label: "Resolver Firewall Rule Group"]
+    aws_route53_resolver_firewall_rule_group_association.default [icon: "aws-route53", label: "Resolver Firewall Rule Group Association"]
+    aws_route53_resolver_firewall_rule.default [icon: "aws-route53", label: "Resolver Firewall Rule"]
+    aws_route53_resolver_query_log_config.default [icon: "aws-route53", label: "Resolver Query Log Config"]
+    aws_route53_resolver_query_log_config_association.default [icon: "aws-route53", label: "Resolver Query Log Config Association"]
+  }
+}
+
+// Connections
+module.this > aws_route53_resolver_firewall_domain_list.default
+module.this > aws_route53_resolver_firewall_rule_group.default
+aws_route53_resolver_firewall_rule_group.default > aws_route53_resolver_firewall_rule_group_association.default
+module.this > aws_route53_resolver_firewall_rule_group_association.default
+module.this > aws_route53_resolver_query_log_config.default
+aws_route53_resolver_query_log_config.default > aws_route53_resolver_query_log_config_association.default
+```
+
+### Metrics
+
+- **LLM Time**: 4.33 Seconds
+- **Total Time**: 4.918 Seconds
+- **Total Cost**: $0.000515
+
+
+### OpenAI o1-preview
+
+#### Diagram
+
+![Result Diagram](./assets/example4-o1.png)
+
+#### Code
+```
+direction right
+
+aws_cloud {
+  aws_route53_resolver [icon: "aws-route53", label: "Amazon Route 53 Resolver"] {
+    route53_resolver_firewall [icon: "aws-route53", label: "Resolver DNS Firewall"] {
+      aws_route53_resolver_firewall_config.default [icon: "aws-route53", label: "Firewall Config"]
+      aws_route53_resolver_firewall_domain_list.default [icon: "aws-route53", label: "Firewall Domain List"]
+      aws_route53_resolver_firewall_rule_group.default [icon: "aws-route53", label: "Firewall Rule Group"]
+      aws_route53_resolver_firewall_rule_group_association.default [icon: "aws-route53", label: "Firewall Rule Group Association"]
+      aws_route53_resolver_firewall_rule.default [icon: "aws-route53", label: "Firewall Rule"]
+    }
+    route53_resolver_query_logging [icon: "aws-route53", label: "Resolver Query Logging"] {
+      aws_route53_resolver_query_log_config.default [icon: "aws-route53", label: "Query Log Config"]
+      aws_route53_resolver_query_log_config_association.default [icon: "aws-route53", label: "Query Log Config Association"]
+    }
+  }
+}
+
+// Connections
+aws_route53_resolver_firewall_rule_group_association.default > aws_route53_resolver_firewall_rule_group.default
+aws_route53_resolver_firewall_rule.default > aws_route53_resolver_firewall_rule_group.default
+aws_route53_resolver_firewall_rule.default > aws_route53_resolver_firewall_domain_list.default
+aws_route53_resolver_query_log_config_association.default > aws_route53_resolver_query_log_config.default
+```
+
+### Metrics
+
+- **Total Time**: 104.331 Seconds
+- **Total Cost**: $0.52
